@@ -40,14 +40,34 @@ func addNewTask(context *gin.Context) {
 func deleteTaskById(context *gin.Context) {
 	id := context.Param("id")
 	if err := TaskRepository.DeleteTaskById(id); err != nil {
+		fmt.Println("Error during deleting task "+id, err)
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	context.String(http.StatusOK, "Task is deleted")
 }
 
+func updateTask(context *gin.Context) {
+	id := context.Param("id")
+	var updatedTask Task
+	if err := context.ShouldBindBodyWith(&updatedTask, binding.JSON); err != nil {
+		fmt.Println("Error during binding updated task "+id, err)
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err2 := TaskRepository.UpdateTaskById(updatedTask); err2 != nil {
+		fmt.Println("Error during updating task "+id, err2)
+		context.JSON(http.StatusBadRequest, gin.H{"error": err2.Error()})
+		return
+	}
+
+	context.String(http.StatusOK, "Task is updated")
+}
+
 func SetTasksApi(router *gin.Engine) {
 	router.GET("/task", getAllTasks)
 	router.POST("task", addNewTask)
 	router.DELETE("/task/:id", deleteTaskById)
+	router.PATCH("/task/:id", updateTask)
 }

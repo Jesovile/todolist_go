@@ -20,6 +20,7 @@ type TaskRepositoryI interface {
 	AddNewTask(newTask Task)
 	GetTaskById(taskId string) (Task, error)
 	DeleteTaskById(taskId string) error
+	UpdateTaskById(updatedTask Task) error
 }
 
 type taskRepositoryT struct {
@@ -71,6 +72,21 @@ func (repo *taskRepositoryT) DeleteTaskById(taskId string) error {
 		}
 	}
 	repo.tasks = newTasks
+	return nil
+}
+func (repo *taskRepositoryT) UpdateTaskById(updatedTask Task) error {
+	var isUpdated = false
+	for i := range repo.tasks {
+		if repo.tasks[i].Id == updatedTask.Id {
+			repo.tasks[i].Title = updatedTask.Title
+			repo.tasks[i].Description = updatedTask.Description
+			repo.tasks[i].Status = updatedTask.Status
+			isUpdated = true
+		}
+	}
+	if !isUpdated {
+		return errors.New("No such task")
+	}
 	return nil
 }
 
