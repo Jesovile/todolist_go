@@ -1,0 +1,9 @@
+services:
+  todolist-api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    container_name: "todolist-api"
+    ports:
+      - "9090:9090"
