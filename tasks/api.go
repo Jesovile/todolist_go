@@ -1,8 +1,15 @@
 package tasks
 
-import "fmt"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
-func ApiMain() {
+func getAllTasks(context *gin.Context) {
 	tasks := TaskRepository.GetAllTasks()
-	fmt.Println(tasks)
+	context.JSON(http.StatusOK, tasks)
+}
+
+func SetTasksApi(router *gin.Engine) {
+	router.GET("/tasks", getAllTasks)
 }

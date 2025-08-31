@@ -1,5 +1,7 @@
 package tasks
 
+import "strconv"
+
 // Tasks Repository Types
 
 type Task struct {
@@ -21,7 +23,7 @@ type taskRepositoryT struct {
 func getStubData(count int) []Task {
 	var result []Task
 	for i := 1; i <= count; i++ {
-		var stringIndex = string(i)
+		var stringIndex = strconv.Itoa(i)
 		taskItem := Task{stringIndex, "Task title " + stringIndex, "Task description for Task " + stringIndex, "todo"}
 		result = append(result, taskItem)
 	}
@@ -33,7 +35,10 @@ func (repo taskRepositoryT) GetAllTasks() []Task {
 	return repo.tasks
 }
 
-// TaskRepository Singleton export
-var TaskRepository = taskRepositoryT{
+// taskRepositoryInstance Singleton instance
+var taskRepositoryInstance = taskRepositoryT{
 	tasks: getStubData(15),
 }
+
+// TaskRepository - singleton pointer export
+var TaskRepository = &taskRepositoryInstance
