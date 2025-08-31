@@ -14,6 +14,10 @@ func getAllTasks(context *gin.Context) {
 }
 
 func addNewTask(context *gin.Context) {
+	type NewTaskData struct {
+		Title       string `json:"title" binding:"required"`
+		Description string `json:"description"`
+	}
 	var newTaskData = NewTaskData{
 		Title:       "",
 		Description: "",
@@ -33,7 +37,17 @@ func addNewTask(context *gin.Context) {
 	context.String(http.StatusOK, "Task is added")
 }
 
+func deleteTaskById(context *gin.Context) {
+	id := context.Param("id")
+	if err := TaskRepository.DeleteTaskById(id); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	context.String(http.StatusOK, "Task is deleted")
+}
+
 func SetTasksApi(router *gin.Engine) {
 	router.GET("/task", getAllTasks)
 	router.POST("task", addNewTask)
+	router.DELETE("/task/:id", deleteTaskById)
 }

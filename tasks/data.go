@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	"strconv"
 )
@@ -14,14 +15,11 @@ type Task struct {
 	Status      string `json:"status"`
 }
 
-type NewTaskData struct {
-	Title       string `json:"title" binding:"required"`
-	Description string `json:"description"`
-}
-
 type TaskRepositoryI interface {
 	GetAllTasks() []Task
 	AddNewTask(newTask Task)
+	GetTaskById(taskId string) (Task, error)
+	DeleteTaskById(taskId string) error
 }
 
 type taskRepositoryT struct {
@@ -45,6 +43,35 @@ func (repo *taskRepositoryT) GetAllTasks() []Task {
 }
 func (repo *taskRepositoryT) AddNewTask(newTask Task) {
 	repo.tasks = append(repo.tasks, newTask)
+}
+func (repo *taskRepositoryT) GetTaskById(taskId string) (Task, error) {
+	var filtered []Task
+	for i := 0; i < len(repo.tasks); i++ {
+		task := repo.tasks[i]
+		if task.Id == taskId {
+			filtered = append(filtered, task)
+		}
+	}
+	if len(filtered) == 1 {
+		return filtered[0], nil
+	} else {
+		return Task{}, errors.New("No such task with id: " + taskId)
+	}
+}
+func (repo *taskRepositoryT) DeleteTaskById(taskId string) error {
+	_, err := repo.GetTaskById(taskId)
+	if err != nil {
+		return err
+	}
+	var newTasks []Task
+	for i := 0; i < len(repo.tasks); i++ {
+		currentTask := repo.tasks[i]
+		if currentTask.Id != taskId {
+			newTasks = append(newTasks, currentTask)
+		}
+	}
+	repo.tasks = newTasks
+	return nil
 }
 
 // singleton instance
